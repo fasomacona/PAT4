@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tema 4 · Gestión de Bases de Datos Avanzada | GAB-2402</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">🗄️ GAB-2402 <span>Tema 4</span></div>
+      <nav>
+        <ul>
+          <li><a href="index.html" class="active">Inicio</a></li>
+          <li><a href="01-diseno-esquemas.html">4.1 Diseño de esquemas</a></li>
+          <li><a href="02-relacionales-nosql.html">4.2 Relacionales y NoSQL</a></li>
+          <li><a href="03-consultas-avanzadas.html">4.3 Consultas avanzadas</a></li>
+          <li><a href="practica.html">Práctica Jupyter</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="badge">Asignatura: Programación Avanzada · GAB-2402</div>
+      <h1>Gestión de Bases de Datos Avanzada</h1>
+      <p>
+        Diseña esquemas optimizados, trabaja con bases relacionales y NoSQL, 
+        y domina consultas avanzadas y operaciones de manipulación sobre 
+        grandes volúmenes de datos.
+      </p>
+      <div class="btn-group" style="justify-content: center;">
+        <a href="01-diseno-esquemas.html" class="btn">Comenzar teoría</a>
+        <a href="practica.html" class="btn btn-accent">Ir a la práctica</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>¿Qué aprenderás en este tema?</h2>
+      <p>
+        La gestión de datos a escala requiere más que saber escribir un 
+        <code>SELECT</code>. En este tema profundizarás en el diseño de esquemas, 
+        la normalización, la optimización, el uso de PostgreSQL/MySQL y MongoDB, 
+        y el acceso a bases de datos desde Python (SQLAlchemy, psycopg2, pymongo).
+      </p>
+
+      <h3>Competencias específicas a desarrollar</h3>
+      <ul>
+        <li>Diseñar esquemas de bases de datos avanzadas para almacenar y gestionar grandes volúmenes de datos.</li>
+        <li>Realizar consultas avanzadas y operaciones de manipulación en bases relacionales y NoSQL.</li>
+        <li>Dominar herramientas de gestión (SQL, sistemas de gestión de bases de datos específicos).</li>
+        <li>Integrar la gestión de bases de datos en el proceso de análisis de datos, desde la adquisición hasta la presentación de resultados.</li>
+        <li>Considerar requisitos de privacidad y seguridad en el diseño y la gestión de datos.</li>
+      </ul>
+    </section>
+
+    <h2 style="margin-bottom: 1.25rem; color: var(--primary);">Contenido del tema</h2>
+    <div class="cards">
+      <article class="card">
+        <h3>📐 4.1 Diseño y optimización</h3>
+        <p>
+          Modelo entidad-relación, normalización (1FN–3FN, BCNF), claves, 
+          índices, integridad referencial y optimización de esquemas.
+        </p>
+        <a href="01-diseno-esquemas.html">Estudiar →</a>
+      </article>
+
+      <article class="card">
+        <h3>🗃️ 4.2 Relacionales y NoSQL</h3>
+        <p>
+          PostgreSQL/MySQL vs MongoDB: cuándo usar cada uno, modelado 
+          documental, conexiones desde Python y operaciones CRUD.
+        </p>
+        <a href="02-relacionales-nosql.html">Estudiar →</a>
+      </article>
+
+      <article class="card">
+        <h3>🔍 4.3 Consultas avanzadas</h3>
+        <p>
+          JOINs, subconsultas, window functions, CTEs, agregaciones, 
+          transacciones y manipulación de datos a gran escala.
+        </p>
+        <a href="03-consultas-avanzadas.html">Estudiar →</a>
+      </article>
+
+      <article class="card" style="border: 2px solid #10b981;">
+        <h3>💻 Práctica en Jupyter</h3>
+        <p>
+          Notebook con SQLite/PostgreSQL, consultas avanzadas, 
+          SQLAlchemy y ejercicios de modelado + MongoDB (opcional).
+        </p>
+        <a href="practica.html">Ir a la práctica →</a>
+      </article>
+    </div>
+
+    <section class="section">
+      <h2>Herramientas que usarás</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Herramienta</th>
+            <th>Rol</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>PostgreSQL / MySQL / SQLite</strong></td>
+            <td>Bases de datos relacionales</td>
+          </tr>
+          <tr>
+            <td><strong>MongoDB</strong></td>
+            <td>Base de datos NoSQL documental</td>
+          </tr>
+          <tr>
+            <td><strong>SQLAlchemy / psycopg2 / sqlite3</strong></td>
+            <td>Acceso desde Python</td>
+          </tr>
+          <tr>
+            <td><strong>pymongo</strong></td>
+            <td>Cliente oficial de MongoDB para Python</td>
+          </tr>
+          <tr>
+            <td><strong>pandas</strong></td>
+            <td>Lectura/escritura de resultados de consultas</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout tip">
+        <strong>💡 Consejo</strong>
+        Para la práctica local puedes usar <strong>SQLite</strong> (no requiere servidor). 
+        Para un entorno más realista, instala PostgreSQL o usa un contenedor Docker.
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Estructura recomendada de estudio</h2>
+      <ol>
+        <li><strong>Teoría 4.1</strong>: Diseño, normalización e índices.</li>
+        <li><strong>Teoría 4.2</strong>: Comparar relacional vs NoSQL y practicar conexiones.</li>
+        <li><strong>Teoría 4.3</strong>: Consultas avanzadas y transacciones.</li>
+        <li><strong>Práctica Jupyter</strong>: Implementar el esquema, cargar datos y consultar.</li>
+        <li><strong>Proyecto</strong>: Base de datos para un caso de analítica (ventas, sensores, clientes).</li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      <strong>GAB-2402 · Programación Avanzada</strong><br>
+      Tecnológico de Estudios Superiores de Chalco · Ingeniería Informática<br>
+      Especialidad: Gestión y Analítica Avanzada de Datos
+    </p>
+    <p style="margin-top: 0.75rem; font-size: 0.95rem;">
+      Material didáctico creado por el <strong>Prof. Fabián Soberanes Martín</strong>
+    </p>
+  </footer>
+</body>
+</html>

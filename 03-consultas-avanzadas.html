@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4.3 Consultas avanzadas y manipulación de datos | Tema 4</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">🗄️ GAB-2402 <span>Tema 4</span></div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="01-diseno-esquemas.html">4.1 Diseño de esquemas</a></li>
+          <li><a href="02-relacionales-nosql.html">4.2 Relacionales y NoSQL</a></li>
+          <li><a href="03-consultas-avanzadas.html" class="active">4.3 Consultas avanzadas</a></li>
+          <li><a href="practica.html">Práctica Jupyter</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="breadcrumb">
+      <a href="index.html">Inicio</a> › 4.3 Consultas avanzadas y operaciones de manipulación de datos
+    </div>
+
+    <section class="section">
+      <h2>4.3 Consultas avanzadas y operaciones de manipulación de datos</h2>
+      
+      <p>
+        Las consultas avanzadas permiten responder preguntas de negocio sin 
+        sacar todos los datos a la aplicación. Dominar JOINs, CTEs, funciones 
+        de ventana y transacciones es esencial en analítica y en backends robustos.
+      </p>
+
+      <h3>1. JOINs</h3>
+<pre><code><span class="cmt">-- INNER JOIN: solo coincidencias</span>
+<span class="kw">SELECT</span> c.nombre, p.pedido_id, p.fecha, p.total
+<span class="kw">FROM</span> clientes c
+<span class="kw">INNER JOIN</span> pedidos p <span class="kw">ON</span> c.cliente_id = p.cliente_id;
+
+<span class="cmt">-- LEFT JOIN: todos los clientes, con o sin pedidos</span>
+<span class="kw">SELECT</span> c.nombre, COUNT(p.pedido_id) <span class="kw">AS</span> num_pedidos
+<span class="kw">FROM</span> clientes c
+<span class="kw">LEFT JOIN</span> pedidos p <span class="kw">ON</span> c.cliente_id = p.cliente_id
+<span class="kw">GROUP BY</span> c.cliente_id, c.nombre;
+
+<span class="cmt">-- Múltiples JOINs</span>
+<span class="kw">SELECT</span> c.nombre, pr.nombre <span class="kw">AS</span> producto, d.cantidad, d.precio_unit
+<span class="kw">FROM</span> pedidos p
+<span class="kw">JOIN</span> clientes c <span class="kw">ON</span> p.cliente_id = c.cliente_id
+<span class="kw">JOIN</span> detalle_pedido d <span class="kw">ON</span> p.pedido_id = d.pedido_id
+<span class="kw">JOIN</span> productos pr <span class="kw">ON</span> d.producto_id = pr.producto_id
+<span class="kw">WHERE</span> p.fecha >= <span class="str">'2024-01-01'</span>;
+</code></pre>
+
+      <h3>2. Agregaciones y filtrado de grupos</h3>
+<pre><code><span class="kw">SELECT</span>
+    ciudad,
+    COUNT(*) <span class="kw">AS</span> clientes,
+    AVG(total_gastado) <span class="kw">AS</span> promedio
+<span class="kw">FROM</span> (
+    <span class="kw">SELECT</span> c.ciudad, c.cliente_id, COALESCE(SUM(p.total), 0) <span class="kw">AS</span> total_gastado
+    <span class="kw">FROM</span> clientes c
+    <span class="kw">LEFT JOIN</span> pedidos p <span class="kw">ON</span> c.cliente_id = p.cliente_id
+    <span class="kw">GROUP BY</span> c.ciudad, c.cliente_id
+) t
+<span class="kw">GROUP BY</span> ciudad
+<span class="kw">HAVING</span> COUNT(*) >= 5
+<span class="kw">ORDER BY</span> promedio <span class="kw">DESC</span>;
+</code></pre>
+
+      <h3>3. Subconsultas</h3>
+<pre><code><span class="cmt">-- Subconsulta escalar</span>
+<span class="kw">SELECT</span> nombre, precio
+<span class="kw">FROM</span> productos
+<span class="kw">WHERE</span> precio > (<span class="kw">SELECT</span> AVG(precio) <span class="kw">FROM</span> productos);
+
+<span class="cmt">-- IN / EXISTS</span>
+<span class="kw">SELECT</span> nombre
+<span class="kw">FROM</span> clientes
+<span class="kw">WHERE</span> cliente_id <span class="kw">IN</span> (
+    <span class="kw">SELECT</span> cliente_id <span class="kw">FROM</span> pedidos <span class="kw">WHERE</span> total > 5000
+);
+
+<span class="kw">SELECT</span> c.nombre
+<span class="kw">FROM</span> clientes c
+<span class="kw">WHERE EXISTS</span> (
+    <span class="kw">SELECT</span> 1 <span class="kw">FROM</span> pedidos p
+    <span class="kw">WHERE</span> p.cliente_id = c.cliente_id
+      <span class="kw">AND</span> p.fecha >= CURRENT_DATE - INTERVAL <span class="str">'30 days'</span>
+);
+</code></pre>
+
+      <h3>4. Common Table Expressions (CTE)</h3>
+      <p>
+        Las CTE mejoran la legibilidad y permiten reutilizar subconsultas 
+        (incluyendo recursivas).
+      </p>
+<pre><code><span class="kw">WITH</span> ventas_cliente <span class="kw">AS</span> (
+    <span class="kw">SELECT</span>
+        cliente_id,
+        COUNT(*) <span class="kw">AS</span> num_pedidos,
+        SUM(total) <span class="kw">AS</span> monto_total
+    <span class="kw">FROM</span> pedidos
+    <span class="kw">GROUP BY</span> cliente_id
+),
+top_clientes <span class="kw">AS</span> (
+    <span class="kw">SELECT</span> *
+    <span class="kw">FROM</span> ventas_cliente
+    <span class="kw">WHERE</span> monto_total > 10000
+)
+<span class="kw">SELECT</span> c.nombre, t.num_pedidos, t.monto_total
+<span class="kw">FROM</span> top_clientes t
+<span class="kw">JOIN</span> clientes c <span class="kw">ON</span> c.cliente_id = t.cliente_id
+<span class="kw">ORDER BY</span> t.monto_total <span class="kw">DESC</span>;
+</code></pre>
+
+      <h3>5. Funciones de ventana (Window Functions)</h3>
+<pre><code><span class="kw">SELECT</span>
+    cliente_id,
+    pedido_id,
+    fecha,
+    total,
+    SUM(total) <span class="kw">OVER</span> (
+        <span class="kw">PARTITION BY</span> cliente_id
+        <span class="kw">ORDER BY</span> fecha
+        <span class="kw">ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</span>
+    ) <span class="kw">AS</span> acumulado,
+    RANK() <span class="kw">OVER</span> (
+        <span class="kw">PARTITION BY</span> DATE_TRUNC(<span class="str">'month'</span>, fecha)
+        <span class="kw">ORDER BY</span> total <span class="kw">DESC</span>
+    ) <span class="kw">AS</span> ranking_mes,
+    LAG(total) <span class="kw">OVER</span> (
+        <span class="kw">PARTITION BY</span> cliente_id <span class="kw">ORDER BY</span> fecha
+    ) <span class="kw">AS</span> total_anterior
+<span class="kw">FROM</span> pedidos;
+</code></pre>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Función</th>
+            <th>Uso típico</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>ROW_NUMBER()</code>, <code>RANK()</code>, <code>DENSE_RANK()</code></td>
+            <td>Rankings y top-N por grupo</td>
+          </tr>
+          <tr>
+            <td><code>LAG</code> / <code>LEAD</code></td>
+            <td>Comparar con fila anterior/siguiente</td>
+          </tr>
+          <tr>
+            <td><code>SUM/AVG/... OVER</code></td>
+            <td>Totales móviles, acumulados</td>
+          </tr>
+          <tr>
+            <td><code>NTILE(k)</code></td>
+            <td>Segmentar en percentiles / buckets</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>6. Manipulación de datos (DML) y transacciones</h3>
+<pre><code><span class="kw">BEGIN</span>;
+
+<span class="kw">UPDATE</span> productos
+<span class="kw">SET</span> stock = stock - 2
+<span class="kw">WHERE</span> producto_id = 10 <span class="kw">AND</span> stock >= 2;
+
+<span class="kw">INSERT INTO</span> detalle_pedido (pedido_id, producto_id, cantidad, precio_unit)
+<span class="kw">VALUES</span> (1001, 10, 2, 499.99);
+
+<span class="kw">UPDATE</span> pedidos
+<span class="kw">SET</span> total = (
+    <span class="kw">SELECT</span> SUM(cantidad * precio_unit)
+    <span class="kw">FROM</span> detalle_pedido
+    <span class="kw">WHERE</span> pedido_id = 1001
+)
+<span class="kw">WHERE</span> pedido_id = 1001;
+
+<span class="kw">COMMIT</span>;  <span class="cmt">-- o ROLLBACK si algo falla</span>
+</code></pre>
+
+      <div class="callout warning">
+        <strong>⚠️ ACID</strong>
+        Las transacciones garantizan Atomicidad, Consistencia, Aislamiento y 
+        Durabilidad. En operaciones que afectan varias tablas (pedido + stock + 
+        detalle), usa siempre transacción explícita.
+      </div>
+
+      <h3>7. UPSERT y bulk operations</h3>
+<pre><code><span class="cmt">-- PostgreSQL: INSERT ... ON CONFLICT</span>
+<span class="kw">INSERT INTO</span> clientes (email, nombre, ciudad)
+<span class="kw">VALUES</span> (<span class="str">'ana@mail.com'</span>, <span class="str">'Ana López'</span>, <span class="str">'CDMX'</span>)
+<span class="kw">ON CONFLICT</span> (email)
+<span class="kw">DO UPDATE SET</span>
+    nombre = EXCLUDED.nombre,
+    ciudad = EXCLUDED.ciudad;
+
+<span class="cmt">-- Carga masiva desde Python (pandas)</span>
+df.to_sql(<span class="str">'staging_ventas'</span>, engine, if_exists=<span class="str">'append'</span>, index=False, method=<span class="str">'multi'</span>)
+</code></pre>
+
+      <h3>8. Análisis de rendimiento</h3>
+<pre><code><span class="kw">EXPLAIN ANALYZE</span>
+<span class="kw">SELECT</span> c.nombre, SUM(p.total)
+<span class="kw">FROM</span> clientes c
+<span class="kw">JOIN</span> pedidos p <span class="kw">ON</span> c.cliente_id = p.cliente_id
+<span class="kw">WHERE</span> p.fecha >= <span class="str">'2024-01-01'</span>
+<span class="kw">GROUP BY</span> c.nombre;
+</code></pre>
+      <ul>
+        <li>Busca Seq Scan en tablas grandes cuando esperabas Index Scan.</li>
+        <li>Revisa estimaciones de filas vs filas reales (estadísticas desactualizadas → <code>ANALYZE</code>).</li>
+        <li>Evita funciones sobre columnas indexadas en el <code>WHERE</code> (<code>WHERE YEAR(fecha)=2024</code> impide usar índice; mejor rango de fechas).</li>
+      </ul>
+
+      <h3>9. Buenas prácticas de seguridad</h3>
+      <ul>
+        <li><strong>Nunca</strong> concatenes input de usuario en SQL (inyección). Usa parámetros / placeholders.</li>
+        <li>Principio de mínimo privilegio: usuarios de la app con permisos solo a lo necesario.</li>
+        <li>Cifrado en tránsito (TLS) y en reposo cuando haya datos sensibles.</li>
+        <li>Auditoría de accesos y cambios en tablas críticas.</li>
+      </ul>
+
+<pre><code><span class="cmt"># Seguro (parametrizado)</span>
+cursor.execute(
+    <span class="str">'SELECT * FROM clientes WHERE email = %s'</span>,
+    (email_usuario,)
+)
+
+<span class="cmt"># INSEGURO — no lo hagas</span>
+cursor.execute(
+    f<span class="str">"SELECT * FROM clientes WHERE email = '{email_usuario}'"</span>
+)
+</code></pre>
+
+      <div class="btn-group">
+        <a href="02-relacionales-nosql.html" class="btn">← Anterior</a>
+        <a href="practica.html" class="btn btn-accent">Ir a la práctica en Jupyter →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>GAB-2402 · Programación Avanzada</strong> · Tema 4.3</p>
+    <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+      Creado por el <strong>Prof. Fabián Soberanes Martín</strong>
+    </p>
+  </footer>
+</body>
+</html>

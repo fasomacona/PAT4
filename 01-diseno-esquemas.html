@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4.1 Diseño y optimización de esquemas de bases de datos | Tema 4</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">🗄️ GAB-2402 <span>Tema 4</span></div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="01-diseno-esquemas.html" class="active">4.1 Diseño de esquemas</a></li>
+          <li><a href="02-relacionales-nosql.html">4.2 Relacionales y NoSQL</a></li>
+          <li><a href="03-consultas-avanzadas.html">4.3 Consultas avanzadas</a></li>
+          <li><a href="practica.html">Práctica Jupyter</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="breadcrumb">
+      <a href="index.html">Inicio</a> › 4.1 Diseño y optimización de esquemas de bases de datos
+    </div>
+
+    <section class="section">
+      <h2>4.1 Diseño y optimización de esquemas de bases de datos</h2>
+      
+      <p>
+        Un buen esquema es la base de un sistema de datos confiable, eficiente y 
+        mantenible. El diseño deficiente genera redundancia, inconsistencias, 
+        consultas lentas y dificultades para evolucionar el sistema.
+      </p>
+
+      <h3>1. Modelo entidad-relación (ER)</h3>
+      <p>
+        El modelo ER describe el dominio en términos de <strong>entidades</strong> 
+        (cosas del mundo real), <strong>atributos</strong> (propiedades) y 
+        <strong>relaciones</strong> (asociaciones entre entidades).
+      </p>
+
+      <h4>Cardinalidades</h4>
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Ejemplo</th>
+            <th>Implementación típica</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1:1</strong></td>
+            <td>Empleado – Cuenta de usuario</td>
+            <td>FK en una de las tablas (o fusión)</td>
+          </tr>
+          <tr>
+            <td><strong>1:N</strong></td>
+            <td>Cliente – Pedidos</td>
+            <td>FK en el lado N</td>
+          </tr>
+          <tr>
+            <td><strong>N:M</strong></td>
+            <td>Estudiantes – Cursos</td>
+            <td>Tabla intermedia (bridge / junction)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>2. Normalización</h3>
+      <p>
+        La normalización reduce la redundancia y previene anomalías de inserción, 
+        actualización y borrado.
+      </p>
+
+      <h4>Primera forma normal (1FN)</h4>
+      <ul>
+        <li>Cada celda contiene un valor atómico (no listas ni conjuntos).</li>
+        <li>No hay grupos repetitivos.</li>
+      </ul>
+<pre><code><span class="cmt">-- MAL (no atómico)</span>
+cliente_id | telefonos
+1          | 555-1111, 555-2222
+
+<span class="cmt">-- BIEN</span>
+cliente_id | telefono
+1          | 555-1111
+1          | 555-2222
+</code></pre>
+
+      <h4>Segunda forma normal (2FN)</h4>
+      <ul>
+        <li>Está en 1FN.</li>
+        <li>Todo atributo no clave depende de la <strong>clave completa</strong> 
+            (no solo de parte de una clave compuesta).</li>
+      </ul>
+
+      <h4>Tercera forma normal (3FN)</h4>
+      <ul>
+        <li>Está en 2FN.</li>
+        <li>No hay dependencias transitivas: ningún atributo no clave depende 
+            de otro atributo no clave.</li>
+      </ul>
+<pre><code><span class="cmt">-- Problema 3FN: ciudad determina región</span>
+pedido_id | cliente | ciudad | region
+1         | Ana     | GDL    | Occidente
+
+<span class="cmt">-- Solución: separar ciudades</span>
+<span class="cmt">-- ciudades(ciudad PK, region)</span>
+<span class="cmt">-- pedidos(pedido_id, cliente, ciudad FK)</span>
+</code></pre>
+
+      <h4>BCNF (Boyce-Codd)</h4>
+      <p>
+        Toda dependencia funcional relevante tiene como determinante una 
+        <strong>superclave</strong>. Es una versión más estricta de 3FN, útil 
+        cuando hay varias claves candidatas.
+      </p>
+
+      <div class="callout warning">
+        <strong>⚠️ Desnormalización consciente</strong>
+        En analítica y data warehouses a menudo se desnormaliza (esquemas estrella 
+        o copo de nieve) para acelerar consultas de lectura. La clave es hacerlo 
+        de forma deliberada y documentada, no por descuido.
+      </div>
+
+      <h3>3. Claves e integridad</h3>
+<pre><code><span class="kw">CREATE TABLE</span> clientes (
+    cliente_id   <span class="cls">SERIAL</span> <span class="kw">PRIMARY KEY</span>,
+    email        <span class="cls">VARCHAR</span>(255) <span class="kw">NOT NULL UNIQUE</span>,
+    nombre       <span class="cls">VARCHAR</span>(120) <span class="kw">NOT NULL</span>,
+    creado_en    <span class="cls">TIMESTAMP</span> <span class="kw">DEFAULT</span> CURRENT_TIMESTAMP
+);
+
+<span class="kw">CREATE TABLE</span> pedidos (
+    pedido_id    <span class="cls">SERIAL</span> <span class="kw">PRIMARY KEY</span>,
+    cliente_id   <span class="cls">INTEGER</span> <span class="kw">NOT NULL</span>
+                 <span class="kw">REFERENCES</span> clientes(cliente_id)
+                 <span class="kw">ON DELETE RESTRICT ON UPDATE CASCADE</span>,
+    fecha        <span class="cls">DATE</span> <span class="kw">NOT NULL</span>,
+    total        <span class="cls">NUMERIC</span>(12,2) <span class="kw">CHECK</span> (total >= 0)
+);
+</code></pre>
+
+      <h4>Tipos de integridad</h4>
+      <ul>
+        <li><strong>De entidad</strong>: cada fila se identifica de forma única (PK).</li>
+        <li><strong>Referencial</strong>: las FK apuntan a claves existentes (o NULL si se permite).</li>
+        <li><strong>De dominio</strong>: tipos, CHECK, NOT NULL, rangos válidos.</li>
+      </ul>
+
+      <h3>4. Índices</h3>
+      <p>
+        Los índices aceleran búsquedas y joins, pero ralentizan escrituras y 
+        ocupan espacio. Indexa columnas usadas en <code>WHERE</code>, 
+        <code>JOIN</code> y <code>ORDER BY</code> de consultas frecuentes.
+      </p>
+
+<pre><code><span class="cmt">-- Índice simple</span>
+<span class="kw">CREATE INDEX</span> idx_pedidos_fecha <span class="kw">ON</span> pedidos(fecha);
+
+<span class="cmt">-- Índice compuesto (orden importa)</span>
+<span class="kw">CREATE INDEX</span> idx_pedidos_cliente_fecha
+    <span class="kw">ON</span> pedidos(cliente_id, fecha);
+
+<span class="cmt">-- Índice único</span>
+<span class="kw">CREATE UNIQUE INDEX</span> idx_clientes_email <span class="kw">ON</span> clientes(email);
+
+<span class="cmt">-- Índice parcial (PostgreSQL)</span>
+<span class="kw">CREATE INDEX</span> idx_pedidos_activos
+    <span class="kw">ON</span> pedidos(fecha)
+    <span class="kw">WHERE</span> total > 0;
+</code></pre>
+
+      <div class="callout info">
+        <strong>📌 Regla práctica</strong>
+        No indexar todo. Mide con <code>EXPLAIN ANALYZE</code> antes y después. 
+        Un índice inútil solo añade costo de mantenimiento.
+      </div>
+
+      <h3>5. Optimización de esquemas</h3>
+      <ul>
+        <li>Tipos de datos adecuados (no uses <code>VARCHAR(255)</code> para un código de 3 letras).</li>
+        <li>Evita columnas calculadas redundantes salvo que el coste de cálculo sea alto.</li>
+        <li>Particionamiento por rango/lista en tablas muy grandes (PostgreSQL).</li>
+        <li>Separar datos calientes (transaccionales) de datos históricos (archivo / warehouse).</li>
+        <li>Documentar el modelo (diccionario de datos, diagramas ER actualizados).</li>
+      </ul>
+
+      <h3>6. Ejemplo de esquema completo (tienda)</h3>
+<pre><code><span class="kw">CREATE TABLE</span> categorias (
+    categoria_id <span class="cls">SERIAL</span> <span class="kw">PRIMARY KEY</span>,
+    nombre       <span class="cls">VARCHAR</span>(80) <span class="kw">NOT NULL UNIQUE</span>
+);
+
+<span class="kw">CREATE TABLE</span> productos (
+    producto_id  <span class="cls">SERIAL</span> <span class="kw">PRIMARY KEY</span>,
+    categoria_id <span class="cls">INTEGER</span> <span class="kw">REFERENCES</span> categorias(categoria_id),
+    nombre       <span class="cls">VARCHAR</span>(150) <span class="kw">NOT NULL</span>,
+    precio       <span class="cls">NUMERIC</span>(10,2) <span class="kw">NOT NULL CHECK</span> (precio >= 0),
+    stock        <span class="cls">INTEGER</span> <span class="kw">NOT NULL DEFAULT</span> 0 <span class="kw">CHECK</span> (stock >= 0)
+);
+
+<span class="kw">CREATE TABLE</span> clientes (
+    cliente_id <span class="cls">SERIAL</span> <span class="kw">PRIMARY KEY</span>,
+    nombre     <span class="cls">VARCHAR</span>(120) <span class="kw">NOT NULL</span>,
+    email      <span class="cls">VARCHAR</span>(255) <span class="kw">UNIQUE</span>,
+    ciudad     <span class="cls">VARCHAR</span>(80)
+);
+
+<span class="kw">CREATE TABLE</span> pedidos (
+    pedido_id  <span class="cls">SERIAL</span> <span class="kw">PRIMARY KEY</span>,
+    cliente_id <span class="cls">INTEGER</span> <span class="kw">NOT NULL REFERENCES</span> clientes(cliente_id),
+    fecha      <span class="cls">DATE</span> <span class="kw">NOT NULL DEFAULT</span> CURRENT_DATE,
+    estado     <span class="cls">VARCHAR</span>(20) <span class="kw">NOT NULL DEFAULT</span> <span class="str">'pendiente'</span>
+);
+
+<span class="kw">CREATE TABLE</span> detalle_pedido (
+    pedido_id   <span class="cls">INTEGER</span> <span class="kw">REFERENCES</span> pedidos(pedido_id) <span class="kw">ON DELETE CASCADE</span>,
+    producto_id <span class="cls">INTEGER</span> <span class="kw">REFERENCES</span> productos(producto_id),
+    cantidad    <span class="cls">INTEGER</span> <span class="kw">NOT NULL CHECK</span> (cantidad > 0),
+    precio_unit <span class="cls">NUMERIC</span>(10,2) <span class="kw">NOT NULL</span>,
+    <span class="kw">PRIMARY KEY</span> (pedido_id, producto_id)
+);
+</code></pre>
+
+      <div class="btn-group">
+        <a href="index.html" class="btn">← Inicio</a>
+        <a href="02-relacionales-nosql.html" class="btn btn-accent">Siguiente: Relacionales y NoSQL →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>GAB-2402 · Programación Avanzada</strong> · Tema 4.1</p>
+    <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+      Creado por el <strong>Prof. Fabián Soberanes Martín</strong>
+    </p>
+  </footer>
+</body>
+</html>

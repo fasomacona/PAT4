@@ -1,0 +1,61 @@
+cliente_id,nombre,email,ciudad
+1,Ana López,cliente1@mail.com,QRO
+2,Luis García,cliente2@mail.com,PUE
+3,María Hernández,cliente3@mail.com,QRO
+4,Pedro Martínez,cliente4@mail.com,TIJ
+5,Sofía Ramírez,cliente5@mail.com,MTY
+6,Carlos Torres,cliente6@mail.com,MTY
+7,Elena Flores,cliente7@mail.com,CUN
+8,Jorge Ruiz,cliente8@mail.com,PUE
+9,Laura Díaz,cliente9@mail.com,GDL
+10,Miguel Sánchez,cliente10@mail.com,GDL
+11,Cliente_11,cliente11@mail.com,QRO
+12,Cliente_12,cliente12@mail.com,CUN
+13,Cliente_13,cliente13@mail.com,CDMX
+14,Cliente_14,cliente14@mail.com,QRO
+15,Cliente_15,cliente15@mail.com,CUN
+16,Cliente_16,cliente16@mail.com,PUE
+17,Cliente_17,cliente17@mail.com,PUE
+18,Cliente_18,cliente18@mail.com,PUE
+19,Cliente_19,cliente19@mail.com,PUE
+20,Cliente_20,cliente20@mail.com,PUE
+21,Cliente_21,cliente21@mail.com,CUN
+22,Cliente_22,cliente22@mail.com,CUN
+23,Cliente_23,cliente23@mail.com,MTY
+24,Cliente_24,cliente24@mail.com,GDL
+25,Cliente_25,cliente25@mail.com,TIJ
+26,Cliente_26,cliente26@mail.com,PUE
+27,Cliente_27,cliente27@mail.com,CDMX
+28,Cliente_28,cliente28@mail.com,TIJ
+29,Cliente_29,cliente29@mail.com,CUN
+30,Cliente_30,cliente30@mail.com,CDMX
+31,Cliente_31,cliente31@mail.com,CDMX
+32,Cliente_32,cliente32@mail.com,CDMX
+33,Cliente_33,cliente33@mail.com,MTY
+34,Cliente_34,cliente34@mail.com,CUN
+35,Cliente_35,cliente35@mail.com,CDMX
+36,Cliente_36,cliente36@mail.com,PUE
+37,Cliente_37,cliente37@mail.com,QRO
+38,Cliente_38,cliente38@mail.com,CDMX
+39,Cliente_39,cliente39@mail.com,MTY
+40,Cliente_40,cliente40@mail.com,TIJ
+41,Cliente_41,cliente41@mail.com,CUN
+42,Cliente_42,cliente42@mail.com,MTY
+43,Cliente_43,cliente43@mail.com,CDMX
+44,Cliente_44,cliente44@mail.com,CUN
+45,Cliente_45,cliente45@mail.com,QRO
+46,Cliente_46,cliente46@mail.com,CDMX
+47,Cliente_47,cliente47@mail.com,MTY
+48,Cliente_48,cliente48@mail.com,GDL
+49,Cliente_49,cliente49@mail.com,PUE
+50,Cliente_50,cliente50@mail.com,TIJ
+51,Cliente_51,cliente51@mail.com,MTY
+52,Cliente_52,cliente52@mail.com,CUN
+53,Cliente_53,cliente53@mail.com,CDMX
+54,Cliente_54,cliente54@mail.com,PUE
+55,Cliente_55,cliente55@mail.com,CDMX
+56,Cliente_56,cliente56@mail.com,CUN
+57,Cliente_57,cliente57@mail.com,CDMX
+58,Cliente_58,cliente58@mail.com,GDL
+59,Cliente_59,cliente59@mail.com,PUE
+60,Cliente_60,cliente60@mail.com,PUE

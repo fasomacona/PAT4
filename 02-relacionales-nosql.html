@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4.2 Bases de datos relacionales y NoSQL | Tema 4</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">🗄️ GAB-2402 <span>Tema 4</span></div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="01-diseno-esquemas.html">4.1 Diseño de esquemas</a></li>
+          <li><a href="02-relacionales-nosql.html" class="active">4.2 Relacionales y NoSQL</a></li>
+          <li><a href="03-consultas-avanzadas.html">4.3 Consultas avanzadas</a></li>
+          <li><a href="practica.html">Práctica Jupyter</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="breadcrumb">
+      <a href="index.html">Inicio</a> › 4.2 Uso de bases de datos relacionales y NoSQL
+    </div>
+
+    <section class="section">
+      <h2>4.2 Uso de bases de datos relacionales y NoSQL</h2>
+      
+      <p>
+        No existe una única tecnología óptima para todos los casos. Las bases 
+        relacionales destacan en integridad y consultas complejas; las NoSQL 
+        en flexibilidad de esquema, escalado horizontal y ciertos patrones de acceso.
+      </p>
+
+      <h3>1. Comparativa rápida</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Aspecto</th>
+            <th>Relacional (SQL)</th>
+            <th>NoSQL (ej. MongoDB)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Modelo</td>
+            <td>Tablas, filas, columnas</td>
+            <td>Documentos, clave-valor, grafos, columnas</td>
+          </tr>
+          <tr>
+            <td>Esquema</td>
+            <td>Rígido (DDL previo)</td>
+            <td>Flexible / dinámico</td>
+          </tr>
+          <tr>
+            <td>Transacciones</td>
+            <td>ACID fuerte</td>
+            <td>Varía (MongoDB soporta multi-documento ACID)</td>
+          </tr>
+          <tr>
+            <td>Escalado</td>
+            <td>Principalmente vertical (+ réplicas)</td>
+            <td>Diseñado para horizontal (sharding)</td>
+          </tr>
+          <tr>
+            <td>Consultas</td>
+            <td>SQL potente (JOINs, ventanas)</td>
+            <td>API de agregación / consultas por documento</td>
+          </tr>
+          <tr>
+            <td>Casos ideales</td>
+            <td>ERP, finanzas, sistemas transaccionales</td>
+            <td>Contenido, IoT, catálogos, perfiles de usuario</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>2. Bases relacionales desde Python</h3>
+
+      <h4>SQLite (ideal para práctica y prototipos)</h4>
+<pre><code><span class="kw">import</span> sqlite3
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+conn = sqlite3.connect(<span class="str">'tienda.db'</span>)
+
+<span class="cmt"># Ejecutar SQL</span>
+conn.execute(<span class="str">'''
+CREATE TABLE IF NOT EXISTS clientes (
+    cliente_id INTEGER PRIMARY KEY,
+    nombre TEXT NOT NULL,
+    ciudad TEXT
+)
+'''</span>)
+conn.commit()
+
+<span class="cmt"># Leer a DataFrame</span>
+df = pd.read_sql_query(<span class="str">'SELECT * FROM clientes'</span>, conn)
+conn.close()
+</code></pre>
+
+      <h4>PostgreSQL con psycopg2 / SQLAlchemy</h4>
+<pre><code><span class="cmt"># pip install psycopg2-binary sqlalchemy</span>
+<span class="kw">from</span> sqlalchemy <span class="kw">import</span> create_engine, text
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+
+engine = create_engine(
+    <span class="str">'postgresql+psycopg2://usuario:password@localhost:5432/tienda'</span>
+)
+
+<span class="kw">with</span> engine.begin() <span class="kw">as</span> conn:
+    conn.execute(text(
+        <span class="str">'INSERT INTO clientes (nombre, ciudad) VALUES (:n, :c)'</span>
+    ), {<span class="str">'n'</span>: <span class="str">'Ana López'</span>, <span class="str">'c'</span>: <span class="str">'CDMX'</span>})
+
+df = pd.read_sql(<span class="str">'SELECT * FROM clientes LIMIT 10'</span>, engine)
+</code></pre>
+
+      <h4>CRUD relacional completo</h4>
+<pre><code><span class="cmt"># CREATE</span>
+conn.execute(
+    <span class="str">'INSERT INTO productos (nombre, precio, stock) VALUES (?, ?, ?)'</span>,
+    (<span class="str">'Laptop'</span>, 15999.99, 10)
+)
+conn.commit()
+
+<span class="cmt"># READ</span>
+filas = conn.execute(<span class="str">'SELECT * FROM productos WHERE stock > 0'</span>).fetchall()
+
+<span class="cmt"># UPDATE</span>
+conn.execute(
+    <span class="str">'UPDATE productos SET stock = stock - 1 WHERE producto_id = ?'</span>,
+    (1,)
+)
+conn.commit()
+
+<span class="cmt"># DELETE</span>
+conn.execute(<span class="str">'DELETE FROM productos WHERE stock = 0'</span>)
+conn.commit()
+</code></pre>
+
+      <h3>3. MongoDB (NoSQL documental)</h3>
+      <p>
+        Los datos se almacenan como documentos BSON (similar a JSON). Una 
+        <strong>colección</strong> agrupa documentos; no es obligatorio que todos 
+        tengan los mismos campos.
+      </p>
+
+<pre><code><span class="cmt"># pip install pymongo</span>
+<span class="kw">from</span> pymongo <span class="kw">import</span> MongoClient
+
+client = MongoClient(<span class="str">'mongodb://localhost:27017/'</span>)
+db = client[<span class="str">'tienda'</span>]
+productos = db[<span class="str">'productos'</span>]
+
+<span class="cmt"># CREATE</span>
+productos.insert_one({
+    <span class="str">'nombre'</span>: <span class="str">'Laptop'</span>,
+    <span class="str">'precio'</span>: 15999.99,
+    <span class="str">'stock'</span>: 10,
+    <span class="str">'tags'</span>: [<span class="str">'electronica'</span>, <span class="str">'oficina'</span>],
+    <span class="str">'specs'</span>: {<span class="str">'ram'</span>: <span class="str">'16GB'</span>, <span class="str">'cpu'</span>: <span class="str">'i7'</span>}
+})
+
+<span class="cmt"># READ</span>
+<span class="kw">for</span> doc <span class="kw">in</span> productos.find({<span class="str">'precio'</span>: {<span class="str">'$gt'</span>: 10000}}):
+    print(doc[<span class="str">'nombre'</span>], doc[<span class="str">'precio'</span>])
+
+<span class="cmt"># UPDATE</span>
+productos.update_one(
+    {<span class="str">'nombre'</span>: <span class="str">'Laptop'</span>},
+    {<span class="str">'$inc'</span>: {<span class="str">'stock'</span>: -1}}
+)
+
+<span class="cmt"># DELETE</span>
+productos.delete_many({<span class="str">'stock'</span>: 0})
+</code></pre>
+
+      <h4>Agregaciones en MongoDB</h4>
+<pre><code>pipeline = [
+    {<span class="str">'$match'</span>: {<span class="str">'precio'</span>: {<span class="str">'$gte'</span>: 1000}}},
+    {<span class="str">'$group'</span>: {
+        <span class="str">'_id'</span>: <span class="str">'$categoria'</span>,
+        <span class="str">'promedio'</span>: {<span class="str">'$avg'</span>: <span class="str">'$precio'</span>},
+        <span class="str">'total'</span>: {<span class="str">'$sum'</span>: 1}
+    }},
+    {<span class="str">'$sort'</span>: {<span class="str">'promedio'</span>: -1}}
+]
+resultados = list(productos.aggregate(pipeline))
+</code></pre>
+
+      <h3>4. Modelado documental vs relacional</h3>
+      <ul>
+        <li><strong>Embebido</strong>: datos que se leen siempre juntos (dirección dentro del cliente).</li>
+        <li><strong>Referenciado</strong>: datos compartidos o muy grandes (id de categoría en el producto).</li>
+      </ul>
+<pre><code><span class="cmt">// Embebido (buen para lectura conjunta)</span>
+{
+  <span class="str">"nombre"</span>: <span class="str">"Ana"</span>,
+  <span class="str">"direccion"</span>: {
+    <span class="str">"calle"</span>: <span class="str">"Reforma 100"</span>,
+    <span class="str">"ciudad"</span>: <span class="str">"CDMX"</span>,
+    <span class="str">"cp"</span>: <span class="str">"06600"</span>
+  }
+}
+
+<span class="cmt">// Referenciado (evita duplicar catálogos grandes)</span>
+{
+  <span class="str">"nombre"</span>: <span class="str">"Laptop"</span>,
+  <span class="str">"categoria_id"</span>: ObjectId(<span class="str">"..."</span>)
+}
+</code></pre>
+
+      <h3>5. Criterios para elegir</h3>
+      <ol>
+        <li>¿Necesitas JOINs complejos e integridad fuerte? → <strong>Relacional</strong>.</li>
+        <li>¿El esquema cambia con frecuencia y los documentos son jerárquicos? → <strong>Documental</strong>.</li>
+        <li>¿Volumen masivo con acceso por clave simple? → <strong>Clave-valor / wide-column</strong>.</li>
+        <li>¿Relaciones densas tipo red social? → <strong>Grafo</strong>.</li>
+        <li>¿Analítica sobre históricos? → a menudo warehouse relacional o columnar (no solo OLTP).</li>
+      </ol>
+
+      <div class="callout tip">
+        <strong>💡 Arquitecturas modernas</strong>
+        Es habitual combinar ambos mundos: OLTP relacional + caché + 
+        almacén documental o data lake para analítica. La decisión es por 
+        <em>workload</em>, no por moda.
+      </div>
+
+      <div class="btn-group">
+        <a href="01-diseno-esquemas.html" class="btn">← Anterior</a>
+        <a href="03-consultas-avanzadas.html" class="btn btn-accent">Siguiente: Consultas avanzadas →</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>GAB-2402 · Programación Avanzada</strong> · Tema 4.2</p>
+    <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+      Creado por el <strong>Prof. Fabián Soberanes Martín</strong>
+    </p>
+  </footer>
+</body>
+</html>

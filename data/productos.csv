@@ -1,0 +1,41 @@
+producto_id,categoria_id,nombre,precio,stock
+1,4,Balón fútbol,8541.53,10
+2,5,Manual Python,8691.41,7
+3,3,Chamarra,7284.16,34
+4,5,Historia de México,2775.29,34
+5,5,Cómic,923.17,32
+6,2,Lámpara LED,6172.89,4
+7,3,Falda,3988.36,40
+8,3,Cinturón,1141.24,27
+9,3,Playera básica v8,4480.83,6
+10,5,Manual Python v9,356.78,72
+11,4,Mancuernas 5kg v10,8187.42,71
+12,3,Tenis casual v11,2365.08,11
+13,5,Cómic v12,5978.57,33
+14,2,Lámpara LED v13,2838.81,32
+15,4,Mochila gym v14,4703.61,47
+16,2,Termo v15,4942.06,22
+17,4,Balón fútbol v16,1703.45,61
+18,5,Manual Python v17,8726.78,36
+19,1,Teclado mecánico v18,6986.44,43
+20,4,Botella deportiva v19,8457.52,34
+21,2,Juego de sábanas v20,8057.7,64
+22,5,Poesía v21,5400.2,46
+23,4,Mochila gym v22,8299.77,77
+24,1,Hub USB-C v23,841.01,2
+25,1,Laptop Pro v24,1803.05,0
+26,3,Jeans slim v25,453.78,4
+27,3,Chamarra v26,2960.71,13
+28,2,Sartén antiadherente v27,3527.66,26
+29,4,Cuerda saltar v28,2477.57,8
+30,4,Bandas elásticas v29,7466.2,78
+31,3,Falda v30,3241.94,14
+32,4,Guantes v31,2563.36,41
+33,4,Balón fútbol v32,4906.13,76
+34,1,Mouse inalámbrico v33,1310.27,50
+35,3,Chamarra v34,7228.66,62
+36,5,Historia de México v35,716.23,51
+37,3,Sudadera v36,8881.64,3
+38,5,Poesía v37,6960.59,22
+39,1,Webcam HD v38,1827.51,14
+40,2,Termo v39,98.42,42

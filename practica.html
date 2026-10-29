@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Práctica · Jupyter Notebook | Tema 4</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">🗄️ GAB-2402 <span>Tema 4</span></div>
+      <nav>
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="01-diseno-esquemas.html">4.1 Diseño de esquemas</a></li>
+          <li><a href="02-relacionales-nosql.html">4.2 Relacionales y NoSQL</a></li>
+          <li><a href="03-consultas-avanzadas.html">4.3 Consultas avanzadas</a></li>
+          <li><a href="practica.html" class="active">Práctica Jupyter</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="breadcrumb">
+      <a href="index.html">Inicio</a> › Práctica en Jupyter Notebook
+    </div>
+
+    <section class="section">
+      <h2>💻 Práctica: Gestión de Bases de Datos Avanzada</h2>
+      
+      <p>
+        Diseñarás un esquema, crearás la base con SQLite, cargarás datos, 
+        ejecutarás consultas avanzadas y practicarás CRUD. Opcionalmente 
+        trabajarás con MongoDB.
+      </p>
+
+      <div class="practica-box">
+        <h3>📦 Archivos de la práctica</h3>
+        <div class="btn-group">
+          <a href="notebooks/practica_tema4.ipynb" class="btn btn-success" download>
+            ⬇️ practica_tema4.ipynb
+          </a>
+          <a href="sql/schema_tienda.sql" class="btn" download>
+            ⬇️ schema_tienda.sql
+          </a>
+          <a href="data/clientes.csv" class="btn btn-accent" download>
+            ⬇️ datos CSV
+          </a>
+        </div>
+        <p style="margin-top: 1rem; font-size: 0.95rem; color: var(--text-light);">
+          Notebook: <code>notebooks/practica_tema4.ipynb</code><br>
+          Esquema SQL: <code>sql/schema_tienda.sql</code><br>
+          Datos: <code>data/*.csv</code>
+        </p>
+      </div>
+
+      <h3>Objetivos</h3>
+      <ul>
+        <li>Crear un esquema normalizado (tienda: clientes, productos, pedidos, detalle).</li>
+        <li>Cargar datos y verificar integridad referencial.</li>
+        <li>Escribir JOINs, agregaciones, CTEs y window functions.</li>
+        <li>Implementar transacciones y operaciones CRUD seguras.</li>
+        <li>(Opcional) Replicar un subconjunto del modelo en MongoDB.</li>
+      </ul>
+
+      <h3>Estructura del notebook</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Sección</th>
+            <th>Contenido</th>
+            <th>Tiempo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>0. Configuración</td>
+            <td>sqlite3, pandas, rutas</td>
+            <td>5 min</td>
+          </tr>
+          <tr>
+            <td>1. Esquema</td>
+            <td>CREATE TABLE, PK, FK, índices</td>
+            <td>25 min</td>
+          </tr>
+          <tr>
+            <td>2. Carga de datos</td>
+            <td>CSV → tablas, validación</td>
+            <td>20 min</td>
+          </tr>
+          <tr>
+            <td>3. Consultas avanzadas</td>
+            <td>JOINs, CTE, ventanas, HAVING</td>
+            <td>40 min</td>
+          </tr>
+          <tr>
+            <td>4. Transacciones y CRUD</td>
+            <td>Pedido con descuento de stock</td>
+            <td>25 min</td>
+          </tr>
+          <tr>
+            <td>5. Caso práctico</td>
+            <td>Informe de ventas con SQL</td>
+            <td>35 min</td>
+          </tr>
+          <tr>
+            <td>6. Retos</td>
+            <td>MongoDB opcional, optimización</td>
+            <td>30+ min</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Cómo ejecutar</h3>
+      <pre><code>python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+jupyter lab
+# Abrir notebooks/practica_tema4.ipynb</code></pre>
+
+      <div class="callout info">
+        <strong>📌 Evaluación</strong>
+        Se valorará: corrección del esquema, calidad de las consultas, uso de 
+        transacciones, parametrización (seguridad) y claridad de la documentación.
+      </div>
+
+      <div class="btn-group">
+        <a href="03-consultas-avanzadas.html" class="btn">← Volver a la teoría</a>
+        <a href="index.html" class="btn btn-accent">Inicio del tema</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>GAB-2402 · Programación Avanzada</strong> · Práctica Tema 4</p>
+    <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+      Creado por el <strong>Prof. Fabián Soberanes Martín</strong>
+    </p>
+  </footer>
+</body>
+</html>
